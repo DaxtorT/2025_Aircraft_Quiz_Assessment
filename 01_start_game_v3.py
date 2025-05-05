@@ -11,6 +11,14 @@ class StartGame():
         Start Game GUI
         """
 
+        self.imgname_filt = 0
+        self.planeheli_filt = 0
+        self.civmil_filt = 0
+
+        imgname_filt = 0
+        planeheli_filt = 0
+        civmil_filt = 0
+
         bg_path = "C:/Users/scrap/OneDrive - Massey High School/Year 13 (2025)/TCCOUE/Aircraft Quiz/Documentation/aircraft_background.jpg"  # Use correct relative path
         bg_img = Image.open(bg_path)
         resize_img = bg_img.resize((500, 720), Image.Resampling.LANCZOS)  # Resize to fit window
@@ -21,20 +29,62 @@ class StartGame():
         self.start_bg.place(x=0, y=0, relwidth=1, relheight=1)
         self.start_bg.image = self.bg_img
 
-        # self.start_frame = Frame(root)
-        # self.start_frame.place(relx=0.5, rely=0.5, anchor='center')
-
         self.start_heading = Label(root,
                                    text="Welcome To\nThe Best Aircraft Quiz",
-                                   font=("B612", "16", "bold"), width=20, border=1, relief="solid")
-        self.start_heading.place(x=120, y=50)
+                                   font=("B612", "16", "bold"), width=22, border=1, relief="solid")
+        self.start_heading.place(x=110, y=20)
         
         self.start_instruct = Label(root,
                                    text="*Placeholder Instructions*",
-                                   font=("B612", "12", "bold"), width=40, border=1, relief="solid")
-        self.start_instruct.place(x=50, y=150)
+                                   font=("B612", "12", "bold"), width=40, height=3, border=1, relief="solid")
+        self.start_instruct.place(x=50, y=115)
 
+        # Image or Name Filter Frame
+        self.in_filt_frame = Frame(root)
+        self.in_filt_frame.place(x=140, y=215)
+        # Guess Image or Name Buttons
+        self.guess_img_but = Radiobutton(self.in_filt_frame, variable=imgname_filt, value=0,
+                                    text="Guess The Image",
+                                    font=("B612", "10"), width=13, height=2, border=1, relief="solid")
+        self.guess_img_but.grid(row=0, column=0)
+        self.guess_name_but = Radiobutton(self.in_filt_frame, variable=imgname_filt, value=1,
+                                    text="Guess The Name",
+                                    font=("B612", "10"), width=13, height=2, border=1, relief="solid")
+        self.guess_name_but.grid(row=0, column=1)
 
+        # Plane, Heli Filter Frame
+        self.ph_filt_frame = Frame(root)
+        self.ph_filt_frame.place(x=140, y=285)
+        # Plane, Both, Heli Filter Buttons
+        self.plane_filt_but = Radiobutton(self.ph_filt_frame, variable=planeheli_filt, value=1,
+                                    text="Plane",
+                                    font=("B612", "10"), width=9, height=2, border=1, relief="solid")
+        self.plane_filt_but.grid(row=0, column=0)
+        self.both_filt_but = Radiobutton(self.ph_filt_frame, variable=planeheli_filt, value=0,
+                                    text="Both",
+                                    font=("B612", "10"), width=7, height=2, border=1, relief="solid")
+        self.both_filt_but.grid(row=0, column=1)
+        self.heli_filt_but = Radiobutton(self.ph_filt_frame, variable=planeheli_filt, value=2,
+                                    text="Helicopters",
+                                    font=("B612", "10"), width=9, height=2, border=1, relief="solid")
+        self.heli_filt_but.grid(row=0, column=2)
+
+        # Civ, Mil Filter Frame
+        self.cm_filt_frame = Frame(root)
+        self.cm_filt_frame.place(x=140, y=355)
+        # Civilain, Both, Military Filter Buttons
+        self.civ_filt_but = Radiobutton(self.cm_filt_frame, variable=civmil_filt, value=1,
+                                    text="Civilian",
+                                    font=("B612", "10"), width=9, height=2, border=1, relief="solid")
+        self.civ_filt_but.grid(row=0, column=0)
+        self.cm_filt_but = Radiobutton(self.cm_filt_frame, variable=civmil_filt, value=0,
+                                    text="Both",
+                                    font=("B612", "10"), width=7, height=2, border=1, relief="solid")
+        self.cm_filt_but.grid(row=0, column=1)
+        self.mil_filt_but = Radiobutton(self.cm_filt_frame, variable=civmil_filt, value=2,
+                                    text="Military",
+                                    font=("B612", "10"), width=9, height=2, border=1, relief="solid")
+        self.mil_filt_but.grid(row=0, column=2)
 
 # Main Routine
 if __name__ == "__main__":
@@ -42,7 +92,5 @@ if __name__ == "__main__":
     root.title("Colour Quest")
     root.geometry("500x720")
     root.resizable(False, False)
-    #root.grid_rowconfigure(0, weight=1)
-    #root.grid_columnconfigure(0, weight=1)
     StartGame()
     root.mainloop()
