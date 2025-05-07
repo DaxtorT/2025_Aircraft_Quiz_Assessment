@@ -15,8 +15,6 @@ class StartGame():
         self.imgname_filt = StringVar()
         self.planeheli_filt = StringVar()
         self.civmil_filt = StringVar()
-        # Radiobutton color when selected
-        col = "#dddddd"
 
         # Setup required for Background
         bg_path = "C:/Users/scrap/OneDrive - Massey High School/Year 13 (2025)/TCCOUE/Aircraft Quiz/Documentation/aircraft_background.jpg"  # Use correct relative path
@@ -42,52 +40,39 @@ class StartGame():
         # Image or Name Filter Frame
         self.in_filt_frame = Frame(root)
         self.in_filt_frame.place(x=140, y=215)
-        # Guess Image or Name Buttons
         self.imgname_filt.set(0)
-        self.guess_img_but = Radiobutton(self.in_filt_frame, variable=self.imgname_filt, value=0,
-                                    text="Guess The Image", indicatoron=0, selectcolor=col,
-                                    font=("B612", "10"), width=13, height=2, border=1, relief="solid")
-        self.guess_img_but.grid(row=0, column=0)
-        self.guess_name_but = Radiobutton(self.in_filt_frame, variable=self.imgname_filt, value=1,
-                                    text="Guess The Name", indicatoron=0, selectcolor=col,
-                                    font=("B612", "10"), width=13, height=2, border=1, relief="solid")
-        self.guess_name_but.grid(row=0, column=1)
-
+ 
         # Plane, Heli Filter Frame
         self.ph_filt_frame = Frame(root)
         self.ph_filt_frame.place(x=140, y=285)
-        # Plane, Both, Heli Filter Buttons
         self.planeheli_filt.set(0)
-        self.plane_filt_but = Radiobutton(self.ph_filt_frame, variable=self.planeheli_filt, value=1,
-                                    text="Plane", indicatoron=0, selectcolor=col,
-                                    font=("B612", "10"), width=9, height=2, border=1, relief="solid")
-        self.plane_filt_but.grid(row=0, column=0)
-        self.both_filt_but = Radiobutton(self.ph_filt_frame, variable=self.planeheli_filt, value=0,
-                                    text="Both", indicatoron=0, selectcolor=col,
-                                    font=("B612", "10"), width=7, height=2, border=1, relief="solid")
-        self.both_filt_but.grid(row=0, column=1)
-        self.heli_filt_but = Radiobutton(self.ph_filt_frame, variable=self.planeheli_filt, value=2,
-                                    text="Helicopters", indicatoron=0, selectcolor=col,
-                                    font=("B612", "10"), width=9, height=2, border=1, relief="solid")
-        self.heli_filt_but.grid(row=0, column=2)
 
         # Civ, Mil Filter Frame
         self.cm_filt_frame = Frame(root)
         self.cm_filt_frame.place(x=140, y=355)
-        # Civilain, Both, Military Filter Buttons
         self.civmil_filt.set(0)
-        self.civ_filt_but = Radiobutton(self.cm_filt_frame, variable=self.civmil_filt, value=1,
-                                    text="Civilian", indicatoron=0, selectcolor=col,
-                                    font=("B612", "10"), width=9, height=2, border=1, relief="solid")
-        self.civ_filt_but.grid(row=0, column=0)
-        self.cm_filt_but = Radiobutton(self.cm_filt_frame, variable=self.civmil_filt, value=0,
-                                    text="Both", indicatoron=0, selectcolor=col,
-                                    font=("B612", "10"), width=7, height=2, border=1, relief="solid")
-        self.cm_filt_but.grid(row=0, column=1)
-        self.mil_filt_but = Radiobutton(self.cm_filt_frame, variable=self.civmil_filt, value=2,
-                                    text="Military", indicatoron=0, selectcolor=col,
-                                    font=("B612", "10"), width=9, height=2, border=1, relief="solid")
-        self.mil_filt_but.grid(row=0, column=2)
+
+        # List for holding label details (Frame | Text | Variable | Value | Width | Column)
+        start_radio_list = [
+            [self.in_filt_frame, "Guess The Image", self.imgname_filt, 0, 13, 0],
+            [self.in_filt_frame, "Guess The Name", self.imgname_filt, 1, 13, 1],
+            [self.ph_filt_frame, "Plane", self.planeheli_filt, 1, 9, 0],
+            [self.ph_filt_frame, "Both", self.planeheli_filt, 0, 7, 1],
+            [self.ph_filt_frame, "Helicopter", self.planeheli_filt, 2, 9, 2],
+            [self.cm_filt_frame, "Civilian", self.civmil_filt, 1, 9, 0],
+            [self.cm_filt_frame, "Both", self.civmil_filt, 0, 7, 1],
+            [self.cm_filt_frame, "Military", self.civmil_filt, 2, 9, 2]
+        ]
+
+        # List to hold labels once they have been made
+        self.radios_ref_list = []
+
+        # Loop through every item in label list to make label
+        for item in start_radio_list:
+            self.make_radio = Radiobutton(item[0], text=item[1], variable=item[2], value=item[3], width=item[4],
+                                          font=("B612", "10"), selectcolor="#dddddd", height=2, border=1, relief="solid", indicatoron=0)
+            self.make_radio.grid(row=0, column=item[5])
+            self.radios_ref_list.append(self.make_radio)
 
         # Ask user quiz rounds
         self.round_instruct = Label(root, text="*Placeholder Instructions*",
