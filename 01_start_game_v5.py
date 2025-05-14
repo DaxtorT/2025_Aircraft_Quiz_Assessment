@@ -1,6 +1,8 @@
 from tkinter import *
 from PIL import ImageTk, Image
 from functools import partial
+import csv
+import random
 
 # Global Variables
 big_font = ("B612", "16", "bold")
@@ -8,6 +10,28 @@ med_font = ("B612", "12")
 med_fontb = ("B612", "12", "bold")
 small_font = ("B612", "10")
 small_fontb = ("B612", "10", "bold")
+
+# Global Functions Here
+def get_csv_data():
+    """
+    Gets data from the csv file.
+    Returns: list of aircraft where each item has the 
+    name, type, workplace, and image file name
+    """
+    file = open("Aircraft Quiz/Aircraft Data/00_aircraft.csv", "r")
+    all_aircraft = list(csv.reader(file, delimiter=","))
+    file.close()
+
+    # Remove the first row (header) from the list
+    all_aircraft.pop(0)
+
+    return all_aircraft
+
+def get_names():
+    """
+    Get names from the csv and return a list of names
+    """
+    print("Get Names")
 
 
 class StartGame():
@@ -26,9 +50,7 @@ class StartGame():
         self.civmil_filt = StringVar()
 
         # Long strings
-        main_instructions = "Before starting the quiz select how you want to play and\n" \
-                            "the filters you want plus the # of rounds you want to quiz.\n" \
-                            "Click Me For More Info"
+        main_instructions = "Select the filter options and enter the number of rounds\nyou want below or Click Here"
         self.round_instructions = "Please enter the # of rounds\n you want to be quizzed on."
 
         # Setup required for Background
@@ -49,7 +71,7 @@ class StartGame():
         
         # Main Quiz Instructions
         self.start_instruct = Button(root, text=main_instructions, command=self.to_instructions,
-                                   font=("B612", "10", "bold"), width=50, height=3, border=1, relief="solid")
+                                   font=("B612", "10", "bold"), width=50, height=2, border=1, relief="solid")
         self.start_instruct.place(x=50, y=115)
 
         # Image or Name Filter Frame
@@ -85,7 +107,7 @@ class StartGame():
         # Loop through every item in label list to make label
         for item in start_radio_list:
             self.make_radio = Radiobutton(item[0], text=item[1], variable=item[2], value=item[3], width=item[4],
-                                          font=("B612", "10"), selectcolor="#dddddd", height=2, border=1, relief="solid", indicatoron=0)
+                                          font=("B612", "10"), bg="#aaaacc", selectcolor="#dddddd", height=2, border=1, relief="solid", indicatoron=0)
             self.make_radio.grid(row=0, column=item[5])
             self.radios_ref_list.append(self.make_radio)
 
@@ -110,6 +132,9 @@ class StartGame():
         """
         Checks whether users input for rounds is valid
         """
+        # Disable start game button
+        self.start_game_but.config(state=DISABLED)
+
         # Retrieve temperature to be converted
         rounds_wanted = self.round_entry.get()
 
@@ -125,9 +150,10 @@ class StartGame():
             rounds_wanted = int(rounds_wanted)
             if rounds_wanted > 0:
                 # Invoke Play Class (and take across number of rounds)
-                Play(rounds_wanted)
+                self.filter_aircraft(self.planeheli_filt, self.civmil_filt)
+                Play(rounds_wanted, self.ph_filt, self.cm_filt)
                 # Hide Root Window (ie: hide rounds choice window)
-                root.withdraw()
+                #root.withdraw()
             else:
                 has_errors == "yes"
 
@@ -136,6 +162,9 @@ class StartGame():
 
         # Display the error if necessary
         if has_errors == "yes":
+            # Re-enable start game button if error occurs
+            self.start_game_but.config(state=NORMAL)
+            # Change label and entry box to show error
             self.round_instruct.config(text=error, fg="#990000", font=small_fontb, wraplength=200)
             self.round_entry.config(bg="#f4cccc")
             self.round_entry.delete(0, END)
@@ -153,12 +182,65 @@ class StartGame():
 
     def end_quiz(self):
         print("End Quiz")
-    
-    def start_quiz(self):
+
+    def filter_aircraft(self, filt1, filt2):
         """
-        Starts the quiz by invoking the Play class, passing the number of rounds entered and the filters chosen by the user
+        Takes the list of aircraft and filters it based on the filters chosen by the user.
+        Returns: list of aircraft that match the filters chosen by the user
         """
-        print("Start Quiz")
+        # Get full aircraft list
+        all_aircraft = get_csv_data()
+
+        # Get the filters chosen by the user
+        ph_filt = filt1.get()
+        if ph_filt == "1":
+            self.ph_filt = "Plane"
+        elif ph_filt == "2":
+            self.ph_filt = "Helicopter"
+        else:
+            self.ph_filt = "Both"
+        cm_filt = filt2.get()
+        if cm_filt == "1":
+            self.cm_filt = "Civilian"
+        elif cm_filt == "2":
+            self.cm_filt = "Military"
+        else:
+            self.cm_filt = "Both"
+
+        # Temp print the list of aircraft
+        print(f"Full List of Aircraft: {all_aircraft}\n\n")
+
+        # Lists for sorting filtered aircraft
+        planeheli_aircraft = []
+        filtered_aircraft = []
+
+        # Filter the list of aircraft based on the filters chosen by the user
+        for aircraft in all_aircraft:
+            # If filter is 'Both' just all all aircraft to list
+            if self.ph_filt == "Both":
+                planeheli_aircraft.append(aircraft)
+            # If filter isn't 'Both' then only add aircraft with corresponding type
+            else:
+                if aircraft[2] == self.ph_filt:
+                    planeheli_aircraft.append(aircraft)
+                
+        # Civlian/Military Filter work
+        for aircraft in planeheli_aircraft:
+            # If filter is 'Both' just all all aircraft to list
+            if self.cm_filt == "Both":
+                filtered_aircraft.append(aircraft)
+            # If filter isn't 'Both' then only add aircraft with corresponding type
+            else:
+                if aircraft[3] == self.cm_filt:
+                    filtered_aircraft.append(aircraft)
+
+        # Set list to 'global'
+        self.filtered_aircraft = filtered_aircraft
+
+        # Temp Print Filtered List
+        print(f"\n\nFiltered List of Aircraft ({self.ph_filt}, {self.cm_filt}):\n{filtered_aircraft}")
+
+        return filtered_aircraft
 
 
 class DisplayInstructions():
@@ -193,7 +275,7 @@ class DisplayInstructions():
         self.instructions_text = Label(self.instructions_frame, text=full_instructions, font=small_font, justify="left")
         self.instructions_text.grid(row=1, padx=10)
 
-        self.dismiss_button = Button(self.instructions_frame, font=med_font,
+        self.dismiss_button = Button(self.instructions_frame, font=med_fontb,
                                      text="Dismiss", command=partial(self.close_instructions, partner))
         self.dismiss_button.grid(row=2, padx=10, pady=10) 
 
@@ -214,8 +296,10 @@ class Play:
     Interface for playing the Colour Quest Game
     """
 
-    def __init__(self, how_many):
+    def __init__(self, how_many, filt1, filt2):
         self.play_box = Toplevel()
+        self.play_box.geometry("500x720")
+        self.play_box.resizable(False, False)
 
         self.game_frame = Frame(self.play_box)
         self.game_frame.grid(padx=10, pady=10)
@@ -223,6 +307,9 @@ class Play:
         self.game_heading = Label(self.game_frame, text=f"Round 0 of {how_many}",
                                   font=("Arial", "16", "bold"))
         self.game_heading.grid(row=0)
+
+        self.game_instruct = Label(self.game_frame, text=f"You are playing the Aircraft Quiz filtered by {filt2} {filt1}'s")
+        self.game_instruct.grid(row=1)
 
 # Main Routine
 if __name__ == "__main__":
